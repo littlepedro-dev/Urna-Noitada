@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UrnaLab – treine o voto sem risco</title>
+  <meta name="description" content="Simulador de urna eletrônica para escolas e oficinas. Candidatos e partidos fictícios.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@110..150,700..900&family=Atkinson+Hyperlegible:wght@400;700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <header class="bar">
+    <a class="wordmark" href="./">
+      <span class="wm-keys" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      UrnaLab
+    </a>
+    <div class="bar-actions">
+      <button class="chip" id="sound-btn" type="button" aria-pressed="true">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="waves" d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/><path class="mute" d="M17 9l5 6M22 9l-5 6"/></svg>
+        <span id="sound-label">Som ligado</span>
+      </button>
+      <button class="chip chip-solid" id="results-btn" type="button">Ver resultados</button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <section class="intro">
+      <h1>Treine o voto antes do dia da eleição.</h1>
+      <p class="lede">Digite um número, confira o candidato na tela e confirme. Todos os candidatos e partidos são inventados e nenhum voto vale de verdade.</p>
+      <ol class="steps" id="steps" aria-label="Etapas do voto">
+        <li class="is-active">Digite o número</li>
+        <li>Confira o candidato</li>
+        <li>Confirme</li>
+      </ol>
+    </section>
+
+    <section class="urna-wrap" aria-label="Urna eletrônica de simulação">
+      <div class="urna" id="urna">
+        <div class="urna-top">
+          <span class="led" id="led"></span>
+          <span>Modelo de demonstração</span>
+          <span class="slot" aria-hidden="true"></span>
+        </div>
+
+        <div class="urna-body">
+          <div class="bezel">
+            <div class="lcd" id="lcd" data-phase="typing">
+              <div class="lcd-main" id="lcd-main">
+                <div class="lcd-fields">
+                  <p class="lcd-kicker">Seu voto para</p>
+                  <h2 class="lcd-office" id="lcd-office">Prefeito(a)</h2>
+                  <div class="lcd-number" id="lcd-number">
+                    <span>Número:</span>
+                    <div class="digits" id="digits">
+                      <b class="digit" id="d1"></b>
+                      <b class="digit" id="d2"></b>
+                    </div>
+                  </div>
+                  <dl class="lcd-info" id="lcd-info" hidden>
+                    <div><dt>Nome:</dt><dd id="info-name"></dd></div>
+                    <div><dt>Partido:</dt><dd id="info-party"></dd></div>
+                  </dl>
+                  <div class="lcd-verdict" id="lcd-verdict" hidden>
+                    <strong id="verdict-title"></strong>
+                    <span id="verdict-text"></span>
+                  </div>
+                </div>
+                <figure class="lcd-photo" id="lcd-photo" hidden>
+                  <div class="photo-art" id="photo-art"></div>
+                  <figcaption id="photo-caption">Prefeito(a)</figcaption>
+                </figure>
+              </div>
+
+              <div class="lcd-end" id="lcd-end" hidden>
+                <strong>FIM</strong>
+                <span>Seu voto de teste foi registrado.</span>
+              </div>
+
+              <p class="lcd-foot" id="lcd-foot"></p>
+            </div>
+          </div>
+
+          <div class="controls">
+            <div class="keys" aria-label="Teclado numérico">
+              <button class="key" type="button" data-digit="1">1</button>
+              <button class="key" type="button" data-digit="2">2</button>
+              <button class="key" type="button" data-digit="3">3</button>
+              <button class="key" type="button" data-digit="4">4</button>
+              <button class="key" type="button" data-digit="5">5</button>
+              <button class="key" type="button" data-digit="6">6</button>
+              <button class="key" type="button" data-digit="7">7</button>
+              <button class="key" type="button" data-digit="8">8</button>
+              <button class="key" type="button" data-digit="9">9</button>
+              <button class="key" type="button" data-digit="0">0</button>
+            </div>
+
+            <div class="actions">
+              <button class="act" type="button" id="blank-btn">
+                <span class="cap cap-white" style="--edge:#a8a290"></span>
+                <span class="label">BRANCO</span>
+              </button>
+              <button class="act" type="button" id="correct-btn">
+                <span class="cap cap-orange" style="--edge:#a8431a"></span>
+                <span class="label">CORRIGE</span>
+              </button>
+              <button class="act act-confirm" type="button" id="confirm-btn">
+                <span class="cap cap-green" style="--edge:#1c6a3a"></span>
+                <span class="label">CONFIRMA</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="urna-base">
+          <span>UrnaLab</span>
+          <span>Simulação, não é urna oficial</span>
+        </div>
+      </div>
+      <p class="store-status"><i></i><span id="storage-status">Votos salvos neste navegador</span></p>
+    </section>
+
+    <section class="roster">
+      <h2>Candidatos de teste</h2>
+      <p>Toque em um candidato para digitar o número dele na urna. Ou digite você mesmo no teclado.</p>
+      <ul id="roster-list"></ul>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>UrnaLab 2026</span>
+    <span>Uso educacional. Dados fictícios.</span>
+  </footer>
+
+  <p class="sr-only" id="sr-status" aria-live="polite"></p>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <dialog class="results" id="results" aria-labelledby="results-title">
+    <div class="results-inner">
+      <header class="results-head">
+        <h2 id="results-title">Resultados de teste</h2>
+        <button class="close" id="close-results" type="button" aria-label="Fechar">×</button>
+      </header>
+      <p class="results-source" id="results-source"></p>
+      <p class="results-total" id="results-total"></p>
+      <div id="results-list"></div>
+      <div class="results-actions">
+        <button class="btn btn-solid" id="refresh-results" type="button">Atualizar</button>
+        <button class="btn btn-line" id="clear-results" type="button" hidden>Apagar votos de teste</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
